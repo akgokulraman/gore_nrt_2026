@@ -42,6 +42,8 @@ Use the below command to output the necessary thermodynamic properties. We have 
 echo -e "Temperature\nPressure\nDensity\nTotal-Energy\nPotential\nKinetic-En.\nBox-Vol\n0" | mpirun gmx energy -f nvt_prod_conf1.edr -o thermo.xvg
 ```
 
+> Automate the above three steps of analysis (obtain index, rdf and thermo files) using [jupyter notebook](../../notebooks/obtain_gromacs_analysis.ipynb), which passes through all the available data files and performs the necessary analysis through GROMACS. To execute the notebook, you can also use SLURM job script, as given [here](../../bin/gromacs_correction_analysis.sh).
+
 ---
 
 # Results / Observations
