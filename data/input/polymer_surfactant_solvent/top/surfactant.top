@@ -1,0 +1,10 @@
+#include "../itp/tween80.martini2.itp"
+#include "../itp/martini_v2.0_PEO_PS_CNP.itp"
+
+[ system ]
+; name
+Surfactant
+
+[ molecules ]
+; name  number
+PS8B 1

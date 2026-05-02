@@ -1,0 +1,14 @@
+#include "../itp/martini_v2.0_PEO_PS_CNP.itp"
+#include "../itp/tween80.martini2.itp"
+#include "../itp/plma25.martini2.itp"
+#include "../itp/toluene.martini2.itp"
+
+[ system ]
+; name
+Polymer, Surfactant, Toluene solvated in water
+
+[ molecules ]
+; name  number
+PS8B 405
+PLMA25 68
+Toluene 42053

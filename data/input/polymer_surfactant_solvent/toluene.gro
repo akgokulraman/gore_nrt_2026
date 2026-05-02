@@ -1,0 +1,6 @@
+/home/3770/.conda/envs/md/bin/polyply gen_coords -p top/toluene.top -o toluene.gro -name tol-solvent -box 1.5 1.5 1.5
+3
+    1Tolue   R1    1   0.589   1.372   1.254
+    1Tolue   R2    2   0.600   1.367   1.147
+    1Tolue   R3    3   0.611   1.461   1.199
+1.5 1.5 1.5

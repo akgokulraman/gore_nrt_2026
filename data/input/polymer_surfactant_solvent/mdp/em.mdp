@@ -1,0 +1,37 @@
+; Not sure about these two parameters
+; rcoulomb         =  1.1
+; epsilon_r        =  15
+
+;;Preprocessing
+; title                   = Surfactant Water energy minimization
+               
+;;Run
+integrator              = steep       ; A steepest descent algorithm for energy minimization
+nsteps                  = 100000      ; Maximum number of steps to integrate or minimize
+emstep                  = 0.0001      ; initial step-size [nm]
+emtol                   = 10        ; \minimization is converged when the maximum force is smaller than this value [kJ mol-1 nm-1]
+dt                      = 0.001       ; ps
+
+;;Boundary Condition
+pbc                     = xyz
+
+;;Neighbour searching
+cutoff-scheme           = Verlet      ; Generate a pair list with buffering 
+nstlist                 = 10          ; Frequency to update the neighbour list [steps]
+
+;;VdW
+vdw-modifier            = None        ; https://manual.gromacs.org/current/user-guide/mdp-options.html
+vdwtype                 = Cut-off
+rvdw                    = 1.1         ; Distance for the LJ or Buckingham cut-off [nm]
+
+;;Electrostatics
+coulomb-modifier        = None        ; https://manual.gromacs.org/current/user-guide/mdp-options.html
+coulombtype             = Cut-off
+rcoulomb                = 1.1         ; Distance for the Coulomb cut-off [nm]
+
+;;Bonds
+constraints             = none        ; Convert the bonds with H-atoms to constraints
+
+;;Output control
+nstlog                  = 10
+nstxout                 = 100
