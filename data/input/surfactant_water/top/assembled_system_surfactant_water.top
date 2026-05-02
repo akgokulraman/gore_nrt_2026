@@ -1,0 +1,12 @@
+#include "../itp/martini_v2.0_PEO_PS_CNP.itp"
+#include "../itp/tween80.martini2.itp"
+;#include "water.martini2.itp"
+
+[ system ]
+; name
+Surfactant in water system
+
+[ molecules ]
+; name  number
+PS8B 120
+W               102734

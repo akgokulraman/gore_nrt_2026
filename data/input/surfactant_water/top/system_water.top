@@ -1,0 +1,10 @@
+#include "../itp/water.martini2.itp"
+#include "../itp/martini_v2.2refP_PEO.itp"
+
+[ system ]
+; name
+Water
+
+[ molecules ]
+; name  number
+W 1

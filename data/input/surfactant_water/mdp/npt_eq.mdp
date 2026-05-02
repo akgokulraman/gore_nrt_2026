@@ -1,0 +1,59 @@
+;;Preprocessing
+; title                   = NPT equilibration 1
+
+; Position restraints
+; define                  = -DPOSRES -DPOSRES_FC_BB=4000.0 -DPOSRES_FC_SC=2000.0 -DPOSRES_FC_LIPID=1000.0 -DDIHRES -DDIHRES_FC=1000.0 
+
+;;Run and output control
+integrator              = md       ; leap-frog algorithm for integrating Newton's equations of motion
+dt                      = 0.002    ; time step for integration in ps
+nsteps                  = 5000000 ; maximum number of steps to integrate or minimize
+nstxout                 = 0        ; save coordinates (trr format)
+nstxout-compressed      = 100000     ; save coordinates every 5 ps (xtc format)
+nstvout                 = 0        ; save velocities every 0.2 ps
+nstfout                 = 0        ; frequency to write forces to output trajectory
+nstcalcenergy           = 10000     ; frequency for calculating the energy
+nstenergy               = 100000     ; frequency to write energies to energy file, save energies every 1 ps
+nstlog                  = 10000     ; frequency to write energies to log file, update log file every 1 ps
+;COM motion removal ; These options eliminate protein/membrane mobility in relation to the solvent/ions.
+; nstcomm                 = 100              ; frequency for center of mass motion removal
+; comm_mode               = linear           ; Remove center of mass translation
+; comm_grps               = SOLU_MEMB SOLV   ; Two groups for center of mass motion removal, default is the whole system
+
+;;Neighbor searching
+cutoff-scheme           = Verlet      ; Generate a pair list with buffering 
+nstlist                 = 20          ; Frequency to update the neighbor list
+
+;;VdW
+vdwtype                 = Cut-off
+vdw-modifier            = None 
+rvdw                    = 1.1         ; Distance for the LJ or Buckingham cut-off [nm]
+
+;;Electrostatics
+coulombtype             = Cut-off        
+coulomb-modifier        = None        ; https://manual.gromacs.org/current/user-guide/mdp-options.html
+rcoulomb                = 1.1         ; Distance for the Coulomb cut-off [nm]
+
+;;Bonds
+constraints             = none        ; Convert the bonds with H-atoms to constraints
+
+;;Temperature coupling 
+tcoupl                  = v-rescale   ; Modified version of Berendsen thermostat, Temperature coupling using velocity rescaling with a stochastic term 
+tc_grps                 = PS8B W      ; Coupling groups 
+tau_t                   = 1.0 1.0     ; Time constant [ps]
+ref_t                   = 300 300     ; Reference temperature [K]
+
+;;Velocity generation
+gen-vel                 = yes         ; Assign velocities from Maxwell distribution
+gen-temp                = 300         ; Temperature for Maxwell distribution
+gen-seed                = -1          ; Generate a random seed
+
+
+;;Pressure coupling is on
+pcoupl                  = C-rescale        ; Modified version of Berendsen Barostat
+pcoupltype              = isotropic  
+;Pressure coupling which is isotropic in the x and y direction, but different in the z direction. This can be useful for membrane simulations.
+tau_p                   = 1.0              ;Time constant for coupling [ps]
+compressibility         = 4.5e-5               ;using water Compressibility  [bar-1]: https://manual.gromacs.org/current/user-guide/mdp-options.html#mdp-pcoupltype 
+ref-p                   = 1.0               ;Reference pressure for coupling bar [bar]
+refcoord_scaling        = com
