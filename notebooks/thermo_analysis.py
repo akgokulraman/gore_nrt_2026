@@ -145,3 +145,27 @@ fig.legend(bbox_to_anchor=(1.0, 1.0))
 plt.tight_layout()
 os.makedirs(figure_save_location, exist_ok=True)
 fig.savefig(f'{figure_save_location}/PE_Clusters.png', bbox_inches="tight")
+
+'''
+Plot density vs time for equilibration_NPT
+'''
+if(ENSEMBLE == 'equilibration_NPT'):
+    fig, ax = plt.subplots(1, 1)
+    # Potential Energy
+    t_pe, pe_mean, pe_std = compute_mean_std(
+        configs_eq_thermo_list,
+        'time (ps)',
+        'density'
+    )
+    ax.plot(t_pe[interval_thermo::interval_thermo], pe_mean[interval_thermo::interval_thermo], color='tab:blue')
+    if(len(configs_eq_thermo_list)>1): # denoting multiple configurations
+        ax.fill_between(
+            t_pe[interval_thermo::interval_thermo],
+            pe_mean[interval_thermo::interval_thermo] - pe_std[interval_thermo::interval_thermo],
+            pe_mean[interval_thermo::interval_thermo] + pe_std[interval_thermo::interval_thermo],
+            color='tab:blue',
+            alpha=0.3
+        )
+    ax.set(xlabel= 'Time (ps)', ylabel=r'Density ($kg/m^3$)')
+    ax.grid(alpha=0.2)
+    fig.savefig(f'{figure_save_location}/density.png', bbox_inches="tight")
