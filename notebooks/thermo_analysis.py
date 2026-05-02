@@ -1,3 +1,15 @@
+'''
+Analysis to obtain the thermodynamic data plots of PE, Number of Clusters, density (only for equilibration_NPT), Pressure, Temperature.
+The python file takes three arguements:
+1. DIR: location of the raw file directory. ex: /lustre/ea-nrtmidas/users/3770/emulsion_stability/data/raw/self_assembly_polymer_surfactant180_toluene_water_20260401-163540
+2. ENSEMBLE: ensemble of the system. only two options are recommended: equilibration_NPT, production_NVT
+3. FIGURES: location to store the plot images. ex: /lustre/ea-nrtmidas/users/3770/emulsion_stability/figures
+4. SUBDIR: specific subdirectory under DIR/ENSEMBLE. If selecting every subdirectory under DIR/ENSEMBLE, type "'*'".
+
+examples:
+python thermo_analysis.py /lustre/ea-nrtmidas/users/3770/emulsion_stability/data/raw/box_var_self_assembly_polymer_surfactant_toluene_water_20260426-192641 production_NVT /lustre/ea-nrtmidas/users/3770/emulsion_stability/figures box_length-34.5_.config-1_.polymer-68_.surfactant-608_.toluene-42053
+python thermo_analysis.py /lustre/ea-nrtmidas/users/3770/emulsion_stability/data/raw/self_assembly_polymer_surfactant180_toluene_water_20260401-163540 production_NVT /lustre/ea-nrtmidas/users/3770/emulsion_stability/figures '*'
+'''
 import pandas as pd
 import glob
 import numpy as np
