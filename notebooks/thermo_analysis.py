@@ -169,3 +169,51 @@ if(ENSEMBLE == 'equilibration_NPT'):
     ax.set(xlabel= 'Time (ps)', ylabel=r'Density ($kg/m^3$)')
     ax.grid(alpha=0.2)
     fig.savefig(f'{figure_save_location}/density.png', bbox_inches="tight")
+
+'''
+Plot Pressure vs time
+'''
+fig, ax = plt.subplots(1, 1)
+# Potential Energy
+t_pe, pe_mean, pe_std = compute_mean_std(
+    configs_eq_thermo_list,
+    'time (ps)',
+    'P'
+)
+ax.plot(t_pe[interval_thermo::interval_thermo], pe_mean[interval_thermo::interval_thermo], color='tab:blue')
+if(len(configs_eq_thermo_list)>1): # denoting multiple configurations
+    ax.fill_between(
+        t_pe[interval_thermo::interval_thermo],
+        pe_mean[interval_thermo::interval_thermo] - pe_std[interval_thermo::interval_thermo],
+        pe_mean[interval_thermo::interval_thermo] + pe_std[interval_thermo::interval_thermo],
+        color='tab:blue',
+        alpha=0.3
+    )
+ax.set(xlabel= 'Time (ps)', ylabel=r'Pressure (bar)')
+ax.axhline(1, ls='--', color='black')
+ax.grid(alpha=0.2)
+fig.savefig(f'{figure_save_location}/pressure.png', bbox_inches="tight")
+
+'''
+Plot Temperature vs time
+'''
+fig, ax = plt.subplots(1, 1)
+# Potential Energy
+t_pe, pe_mean, pe_std = compute_mean_std(
+    configs_eq_thermo_list,
+    'time (ps)',
+    'T'
+)
+ax.plot(t_pe[interval_thermo::interval_thermo], pe_mean[interval_thermo::interval_thermo], color='tab:blue')
+if(len(configs_eq_thermo_list)>1): # denoting multiple configurations
+    ax.fill_between(
+        t_pe[interval_thermo::interval_thermo],
+        pe_mean[interval_thermo::interval_thermo] - pe_std[interval_thermo::interval_thermo],
+        pe_mean[interval_thermo::interval_thermo] + pe_std[interval_thermo::interval_thermo],
+        color='tab:blue',
+        alpha=0.3
+    )
+ax.set(xlabel= 'Time (ps)', ylabel=r'Temperature (K)')
+ax.axhline(298, ls='--', color='black')
+ax.grid(alpha=0.2)
+fig.savefig(f'{figure_save_location}/temperature.png', bbox_inches="tight")
