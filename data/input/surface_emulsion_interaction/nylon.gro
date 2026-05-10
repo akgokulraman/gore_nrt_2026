@@ -1,0 +1,5 @@
+/home/3770/.conda/envs/md/bin/polyply gen_coords -p nylon.top -o ../nylon.gro -name nylon -box 5 5 5
+2
+    1Ny6     R1    1   3.250   1.441   4.441
+    1Ny6     R2    2   3.150   1.359   4.359
+5.0 5.0 5.0

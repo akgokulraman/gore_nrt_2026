@@ -1,0 +1,12 @@
+tolerance 2.0
+output layer.pdb
+pbc 0 0 0 230 230 230
+structure nylon.pdb
+number 5000
+atoms 1
+    below plane 0. 0. 1. 4
+end atoms
+atoms 2
+    above plane 0. 0. 1. 5.6
+end atoms
+end structure

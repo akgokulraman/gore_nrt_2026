@@ -1,0 +1,15 @@
+; /home/3770/.conda/envs/md/bin/polyply gen_params -lib martini2 -o nylon.martini2.itp -name Nylon -seq Nylon:1
+
+; Please cite the following papers:
+; Kroon, P C; Grunewald, F; Barnoud, J; van Tilburg, M; Souza, P C; Wassenaar, T A; Marrink, S J;  elife 2024; 10.7554/elife.90627.2
+
+[ moleculetype ]
+Nylon 1
+
+[ atoms ]
+1 C1 1 Ny6 R1 1 0.0 
+2 P4 1 Ny6 R2 2 0.0 
+
+[ bonds ]
+1 2 1 0.383 5000
+

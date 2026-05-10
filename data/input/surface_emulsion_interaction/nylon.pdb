@@ -1,0 +1,8 @@
+TITLE     /home/3770/.conda/envs/md/bin/polyply gen_coords -p nylon.top -o ../nylon.gro -name nylon -box 5 5 5
+REMARK    THIS IS A SIMULATION BOX
+CRYST1   50.000   50.000   50.000  90.00  90.00  90.00 P 1           1
+MODEL        1
+ATOM      1  R1  Ny6     1      32.500  14.410  44.410  1.00  0.00            
+ATOM      2  R2  Ny6     1      31.500  13.590  43.590  1.00  0.00            
+TER
+ENDMDL
