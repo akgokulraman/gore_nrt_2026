@@ -9,7 +9,16 @@ Date: 2026-03-08 / 2026-03-30
 - pointers (links) to the exact versions of all analysis and plotting routines;
 - pointers (links) to the exact versions of all software used; -->
 ## Obtain interactions of the chemicals
-We use [polyply](https://github.com/marrink-lab/polyply_1.0) as it enables to create polymer with specific repeating units and even help in creating a .gro file, which can be a direct input to GROMACS to perform ensemble based simulations.
+We use [polyply](https://github.com/marrink-lab/polyply_1.0) as it enables to create polymer with specific repeating units and even help in creating a .gro file, which can be a direct input to GROMACS to perform ensemble based simulations. 
+```{note}
+Polyply is a python package. For our project, we used the latest version of polyply, polyply_1.0.
+Since we are modifying/adding to the `polyply` source files, it is recommended that we git clone the repository from [github](https://github.com/marrink-lab/polyply_1.0), modify the files as necessary or as described in the sections below. Later to install the modified `polyply` we use pip install method,
+```{code}
+python -m pip install <POLYPLY_DIR>
+```
+```{note}
+If you want to use the already modified version of the polyply with all the interactions for the chemicals already included, use the [fork](https://github.com/akgokulraman/polyply_1.0) from github.
+```
 
 ### Polymer interaction
 We leverage the previous studies [1,2] to model the polymer. Use the following steps (1-2) to model the polymer.
