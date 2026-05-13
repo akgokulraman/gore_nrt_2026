@@ -62,6 +62,7 @@ All the post-processing analysis to obtain thermodynamics and structural feature
 | [thermo_analysis.py](./notebooks/thermo_analysis.py)           | Obtain the repetative plots of (a) thermodynamic properties, and (b) number of clusters w,r,t time                                                                                                       |
 | [emulsion_analysis.ipynb](./notebooks/emulsion_analysis.ipynb) | Jupyter notebook to (a) analyse RDF plots between different surfactant count cases, (b) combine number of clusters and RDF to characterize structural features of different surfactant count cases       |
 
+The required python packages for this project is provided through this [requirement.txt](./requirements.txt) file.
 
 The general file structure for the repository is as follows:
 ```
@@ -98,6 +99,7 @@ The project also briefly touched upon creating a surface with nylon monomer mole
 
 The project was made possible through the resources used in [DARWIN high performance computing](http://dsi.udel.edu/core/computational-resources/darwin/) present in University of Delaware.
 
+# Team and Contact
 Project Members: Gokul Raman Arumugam Kumar, Rudy DiMura, and Abigail Sicher
 Project Mentors: Dr. Vasudevan Venkateshwaran, Dr. Soham Jariwala
 
