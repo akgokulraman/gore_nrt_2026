@@ -1,0 +1,43 @@
+tolerance 2.0
+output micelle.pdb
+pbc 0 0 0 230 230 230
+structure surfactant.pdb
+  number 12
+  inside sphere 52.7 71.1 67.5 40
+end structure
+structure surfactant.pdb
+  number 12
+  inside sphere 114.3 123.0 57.0 40
+end structure
+structure surfactant.pdb
+  number 12
+  inside sphere 60.5 94.5 169.1 40
+end structure
+structure surfactant.pdb
+  number 12
+  inside sphere 187.2 46.1 131.2 40
+end structure
+structure surfactant.pdb
+  number 12
+  inside sphere 144.7 133.4 177.2 40
+end structure
+structure surfactant.pdb
+  number 12
+  inside sphere 69.6 174.7 171.9 40
+end structure
+structure surfactant.pdb
+  number 12
+  inside sphere 167.0 183.2 59.8 40
+end structure
+structure surfactant.pdb
+  number 12
+  inside sphere 60.9 182.6 90.2 40
+end structure
+structure surfactant.pdb
+  number 12
+  inside sphere 137.7 46.8 42.8 40
+end structure
+structure surfactant.pdb
+  number 12
+  inside sphere 130.5 43.0 189.5 40
+end structure
