@@ -3,12 +3,12 @@ Subject: Model molecule(s) and topology using Polyply, PACKMOL and Gromacs
 Date: 2026-03-08 / 2026-03-30
 ---
 ---
-# Protocols to reproduce results
+# Protocols to reproduce chemical interaction files and structures
 <!-- - pointers (links) to all data files that are created or processed;
 - pointers (links) to all input files and parameters;
 - pointers (links) to the exact versions of all analysis and plotting routines;
 - pointers (links) to the exact versions of all software used; -->
-## Obtain interactions of the chemicals
+## Obtain interactions/force-field of the chemicals
 We use [polyply](https://github.com/marrink-lab/polyply_1.0) as it enables to create polymer with specific repeating units and even help in creating a .gro file, which can be a direct input to GROMACS to perform ensemble based simulations. 
 ```{note}
 Polyply is a python package. For our project, we used the latest version of polyply, polyply_1.0.
@@ -21,39 +21,91 @@ If you want to use the already modified version of the polyply with all the inte
 ```
 
 ### Polymer interaction
-We leverage the previous studies [1,2] to model the polymer. Use the following steps (1-2) to model the polymer.
-1. Create a `.itp` file for the monomer. Refer [plma](../data/input/plma.martini2.itp) file. Store the file in `polyply_1.0/polyply/data/martini2`, so that `polyply` can access the `.itp` file readily when invoked *martini2* library.
-2. Create polymer with specific repeating units using `polyply` using the *LMA* monomer from the above step. A sample example is given here: 
+We leverage the previous studies [1,2] to capture the interactions (force-field) of the desired monomer Lauryl Methacrylate. The `.itp` of the monomer is as follows:
+```
+[ moleculetype ]
+LMA 1
+;
+[ atoms ]
+;  nr    type            resnr   residu    atom     cgnr        charge   
+   1     SC1             1       LMA       MB       1           0.0   
+   2     Na              1       LMA       ME       2           0.0 
+   3     SC1             1       LMA       MT       3           0.0   
+   4     C1              1       LMA       E1       4           0.0   
+   5     C1              1       LMA       E2       5           0.0  
+;
+[ bonds ]
+;  ai    aj   funct  bo(nm)   kb(kJ mol−1 nm−2)
+   1     2    1      0.282    17000
+   2     3    1      0.383    5000
+   3     4    1      0.460    2000
+   4     5    1      0.460    2000
+   1     6    1      0.289    21100   
+;
+[ angles ]
+;  ai    aj   ak     funct  theta_o(deg)   k_theta(kJ mol−1 nm−2)
+   1     2    3      2      144            67
+   2     3    4      2      180            25
+   3     4    5      2      180            25
+   1     6    11     2      175            13
+```
+where, we used the force-field interactions from Poly(butyl methacrylate)[1] and Poly(ethylene)[2]. The monomer force-field interaction can also be found in this [file](../data/input/polymer_surfactant_solvent/itp/plma.martini2.itp). 
+
+Use the following steps to model the polymer's force-field from the monomer force-field.
+1.  Store the file in `polyply_1.0/polyply/data/martini2`, so that `polyply` can access the `.itp` file readily when invoked *martini2* library.
+2. Create polymer's (with specific repeating units) force-field  using `polyply` using the *LMA* monomer from the above step. A sample example is given here: 
     `polyply gen_params -lib martini2 -o plma25.martini2.itp -name PLMA25 -seq LMA:25`
     - This line uses the *LMA* monomer from the *martini2* library.
-    - We create a polymer chain with 10 repeating units of *LMA*. The new chain hereforth is known as *PLMA25*.
-    - Refer to the file instance [here](../data/input/plma25.martini2.itp).
+    - We create the interaction force-field parameter file for Poly(Lauryl Methacrylate) with 25 repeating units. The new chain hereforth is known as *PLMA25*.
+    - Refer to the file instance [here](../data/input/polymer_surfactant_solvent/itp/plma25.martini2.itp).
 
 ### Surfactant interaction
-We refer to [3] to get the interaction between the different beads in the surfactant Tween 80 (Polysorbate 80) 4H-D. Create a `.itp` file for the surfactant ( Refer [Tween 80](../data/input/itp/tween80.martini2.itp) file). 
+We refer to [3] to get the interaction between the different beads in the surfactant Tween 80 (Polysorbate 80) 4H-D. Create a `.itp` file for the surfactant ( Refer [Tween 80](../data/input/polymer_surfactant_solvent/itp/tween80.martini2.itp) file). 
 <!-- Store the file in `polyply_1.0/polyply/data/martini2`, so that `polyply` can access the `.itp` file readily when invoked *martini2* library. -->
 
 ### Organic solvent interaction
-We refer to [4,5] to formulate the grouping of beads in toluene. The actual values to represent toluene is inspired from analysing the benzene and chloro benzene interactions, given in [MARTINI](https://cgmartini.nl/docs/downloads/force-field-parameters/martini2/solvents.html) website. Create a `.itp` file for the organic solvent (Refer [toluene](../data/input/toluene.martini2.itp) file). 
-<!-- Store the file in `polyply_1.0/polyply/data/martini2`, so that `polyply` can access the `.itp` file readily when invoked *martini2* library. -->
+We refer to [4,5] to formulate the grouping of beads in toluene. The actual values to represent toluene is inspired from analysing the benzene and chloro benzene interactions, given in [MARTINI](https://cgmartini.nl/docs/downloads/force-field-parameters/martini2/solvents.html) website. 
+
+Create a `.itp` file for the organic solvent (Refer [toluene](../data/input/polymer_surfactant_solvent/itp/toluene.martini2.itp) file).
+The modified `.itp` file looks like this:
+```
+[moleculetype]
+; molname       nrexcl
+Toluene              1
+
+[atoms]
+; id    type    resnr   residu  atom    cgnr    charge
+  1      SC4      1     Toluene       R1      1      0
+  2      SC4      1     Toluene       R2      2      0
+  3      SC4      1     Toluene       R3      3      0
+
+[constraints]
+; i j   funct   length
+  1 2       1     0.27
+  2 3       1     0.27
+  1 3       1     0.27
+```
+where we assume toluene is made of three beads, with all having saving MARTINI non-bonded interaction type and constraints.
+
 ```{note} 
-From Dr. Soham's meeting on 27th Feb, he mentioned to use the force field of solvent chlorobenzene from the `.itp` file and modify it accordingly.
+This approach was based on the suggestion from Dr. Soham (meeting on 27th Feb), where he mentioned to use the force field of solvent chlorobenzene from the `.itp` file and modify it accordingly.
 ```
 
 ### Water interaction
 Water interactions (non-polar) are available through the martini2.2 interaction file provided in the official [martini website](https://cgmartini.nl/docs/downloads/force-field-parameters/martini2/particle-definitions.html). Create a `.itp` file for water as given in [water](../data/input/itp/water.martini2.itp) file. 
 
+```{note}
 On the good side, water's interaction is not needed, as there is readymade `.gro` file available in the MARTINI webpage. 
-
-## Creating topology (Initial Configuration of the system)
-Once the polymer/surfactant/solvent is modeled, we then need to create a topology for our system. 
+```
+## Creating initial coordinates (Initial Configuration of the system)
+Once the polymer/surfactant/solvent force-field is modeled, we then need to create a coordinate file for our system. 
 
 ### Surfactant-Water system
 The surfactant-water system was already done in [3]. We are following the simulation setup: $23^3 \text{nm}^2$ box with $120$ surfactants. Recreating the results from [3] can verify the model and system credibility. 
 #### Mixture configuration (leading to self-assembly)
-Follow the steps below to create the mixture coordinate file of the surfactant-water system.
+Follow the steps below to create the coordinate file of the surfactant-water mixture system.
 
-1. To Create single surfactant coordinates file (`.gro`) execute `polyply gen_coords -p top/system_surfactant.top -o surfactant.gro -name surfactant -box 5 5 5` . Here `5` denotes $5 \text{ nm}$. The generated coordinate file is included [here](../data/input/surfactant_water/surfactant.gro). The structure of `.top` file used to create the coordinate file is given below:
+1. First, we need to obtain the coordinates file (`.gro`) of the surfactant. For this, execute `polyply gen_coords -p top/system_surfactant.top -o surfactant.gro -name surfactant -box 5 5 5` . Here `5` denotes $5 \text{ nm}$ - box dimension. The generated coordinate file is included [here](../data/input/surfactant_water/surfactant.gro). The structure of `.top` file used to create the coordinate file is given below:
     ```
     #include "../itp/martini_v2.0_PEO_PS_CNP.itp"
     #include "../itp/tween80.martini2.itp"
@@ -67,7 +119,7 @@ Follow the steps below to create the mixture coordinate file of the surfactant-w
     ; name  number
     PS8B 1
     ```
-2. Execute `mpirun gmx insert-molecules -ci surfactant.gro  -nmol 120  -box 23 23 23 -o surfactant120.gro` to create the box of $23^3\text{ nm}^3$ with 120 molecules of surfactant.
+2. Execute `mpirun gmx insert-molecules -ci surfactant.gro  -nmol 120  -box 23 23 23 -o surfactant120.gro` to create the box of $23^3\text{ nm}^3$ with 120 molecules of surfactant. The `insert-molecules` gromacs command, helps in randomly inserting molecules in the given box.
 3. Create a `system_surfactant_water.top` file where we need to include (using `#include`) the martini2.2 interaction file and other interaction files of the respective chemicals. One can download martini2.2 interaction file from official [martini website](https://cgmartini.nl/docs/downloads/force-field-parameters/martini2/particle-definitions.html). The initial `system_surfactant_water.top` should look like this.
     ```
     #include "martini_v2.0_PEO_PS_CNP.itp"
@@ -92,7 +144,7 @@ Follow the steps below to create the mixture coordinate file of the surfactant-w
 5. To solvate the system of surfactants with water, we are going to use gromacs and run the command - `mpirun gmx solvate -cp surfactant120.gro -cs water.gro -o surfactant120_water_solvated -p top/system_surfactant_water.top` which outputs [surfactant120_water_solvated.gro](../data/input/surfactant_water/surfactant120_water_solvated.gro). The command also modifies [system_surfactant_water.top](../data/input/surfactant_water/top/system_surfactant_water.top) to include number of water molecules. In this case, the number of water molecules added due to solvation is 102715. The immediate state after this step can be seen through this [image](../data/input/surfactant_water/after_solvation_immediate_state.png).
 
 #### Assembled configuration
-To create a pre-assembled configuration, we are going to use the software PACKMOL. Refer to the installation page [here](https://m3g.github.io/packmol/userguide.shtml). 
+To create a pre-assembled configuration (or a coordinates file), we are going to use the software PACKMOL. Refer to the installation page [here](https://m3g.github.io/packmol/userguide.shtml). 
 A short summary of the installation is as follows:
 1. After downloading the files from [this link](http://m3g.iqm.unicamp.br/packmol) in your local directory, expand the files using `tar -xvzf packmol-packmol-21.2.1.tar.gz`.
 2. After the files are extracted, go to the extracted directory `cd packmol-21.2.1` and execute `make`. This creates the `packmol` executable.
@@ -237,6 +289,7 @@ Follow the steps below to create the mixture topology of the polymer-toluene-sur
 4. There are representations of water solvent box from the official [martini webpage](https://cgmartini.nl/docs/downloads/example-applications/solvent-systems.html). The obtained `.gro` file for water is included [here](../data/input/polymer_surfactant_water/water.gro)
 
 5. To solvate the system of surfactants with water, we are going to use gromacs and run the command - `mpirun gmx solvate -cp toluene12460_polymer20_surfactant120_conf1.gro -cs water.gro -o solvated_surfactant-120_polymer-20_toluene-12460_water_conf1.gro -p top/surfactant-120_polymer-20_toluene-12460_water_conf1.top` which outputs the necessary initial configuration of the system - solvated with water. Repeat the process to get the three configurations of the solvated systems: `solvated_surfactant-120_polymer-20_toluene-12460_water_conf1.gro`, `solvated_surfactant-120_polymer-20_toluene-12460_water_conf2.gro`, and `solvated_surfactant-120_polymer-20_toluene-12460_water_conf3.gro`.
+
 ---
 # Notes
 <!-- Notes from seminars, meetings, discussions -->
