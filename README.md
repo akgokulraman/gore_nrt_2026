@@ -56,6 +56,8 @@ box_var_self_assembly_polymer_surfactant_toluene_water_20260426-192641/
 ```
 The bash scripts, input files (.top, .itp, .mdp) and other relavant things to get the simulation started can be found in the end of the listed subdirectories.
 
+The modeling of the chemicals was made possible through [polyply](https://github.com/akgokulraman/polyply_1.0.git), where the interaction files of the chemicals are used to build the coordinate file. 
+
 All the post-processing analysis to obtain thermodynamics and structural features are found in [notebooks](./notebooks/) directory. The following tabulation describes the role of each file:
 | File                                                           | Description                                                                                                                                                                                              |
 | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
