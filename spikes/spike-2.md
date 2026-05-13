@@ -123,6 +123,15 @@ As the name suggests, through this analysis, we compare different cases. We most
 - For the equilibration we do NVT simulation so that temperature is finalized like about 10-20 ns with 5-15 fs as timestep. 
     - Why not NPT? "The purpose of doing NVT before NPT is typically based on algorithmic stability. Velocity generation at the outset of a simulation is imperfect, and if coupled with a barostat, can frequently crash. So equilibration is often done under NVT for a short time to get the velocity distribution reasonable, followed by NPT to get the density right."[2]
 - Lou et al.[3] suggested using energy minimization (about 125ps) followed by NPT ensemble of 1000ns.
+- Liu et al. [3] explained the emulsification and de-emulsification process associated with emulsions. 
+  - In their research, they explain how they characterize de-emulsification: (a) Distance variation between two droplet, (b) Number of clusters
+  - For their simulation they used intrinsic $H2O$
+- Dr. Vasu recommended (on 13th Feb 2026) using (a) the total PE, (b) variation in rdf over time as metrics to determine the stability of the emulsion. The emulsion is stable when the value remains constant over time.
+- Dr. Vasu during the weekly meeting on 20th Feb, reiterated the background behind the need for simulation. (Industry needs to prepare large batches of emulsion for coating - Emulsions should be stable for a longer time frame, before being applied on top of the surfaces). Since emulsion stability then becomes the criterion to decide the composition, he suggested to run simulations in batch, thus identifying the necessary compositions useful for Gore.
+  - Unstable emulsions usually need lower timeframe simulations, to know that they will undergo demulsification process in that limited timeframe, like 10-15 ns.
+  - Stable emulsions on the other hand can be judged by running simulations for longer time frame, like 500ns. For longer simulations, we can use `restart` command accordignly.
+  - We can **judge the state of the simulation after each batch runs, and plan further simulations accordingly**.
+  - "For the production run in general will use NPT ensemble with 15fs ranging from 10-15ns to 300ns."
 ---
 # References
 [1] https://montecarlo.sourceforge.net/emc/Welcome.html
