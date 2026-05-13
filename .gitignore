@@ -28,5 +28,5 @@ test/self-assembly/self_assembly*
 template.md
 spikes/*.md
 !spikes/spike-*.md
-
+!data/input/**/*.gro
 
