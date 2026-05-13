@@ -56,6 +56,37 @@ Since the primary objective of the project is not to probe into surfactant water
 | ---------------------------- | ------------------------------------------ |
 | self-assembly (from mixture) | [directory](../test/self-assembly/Test-5/) |
 | pre-assembled                | [directory](../test/pre-assembled/Test-1/) | -->
+## Polymer-solvent-Surfactant-Water system
+Similar to the previous case, but with the addition of polymer and solvent. For this case, we only did self-assembly of the system and varied the surfactant count (to find the stable emulsion) and box size (to account for finite size effects).
+
+Below is the tabulation for different ensemble/step in the simulation process. The reasoning and alloted timeframe (`dt` is kept at 0.02ps for steps 2-4) for each step is as follows:
+| Step No | Ensemble/Step       | Reasoning                                                                                                                | Timeframe |
+| ------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------ | --------- |
+| 1       | Energy Minimization | Modify the molecules position to prevent position overlapping. Helpful to start simulation with reasonable energy state. | NA        |
+| 2       | NVT Equilibration   | To bring the molecules velocity to that of the fixed temperature, based on canonical ensemble.                           | 50ns      |
+| 3       | NPT Equilibration   | To equilibrate the box to a given pressure, thus attaining the corresponding density required for the system.            | 100ns     |
+| 4       | NVT Production      | The actual simulation we are interested to for the dynamics and other observations.                                      | 1000ns    |
+
+Owing to the big data of the different files, refer to .gitignore, the skeleton of different simulation setup only will be shared, which is located in the [data](../data/raw/) directory. Below is the tabulation of different systems which have been simulated with their corresponding executable and simulation directory locations. 
+
+| Index | System         | Box Size (${\text{nm}}^3$) | Executable Location (Hyperlink)                                  | Directory Location (Hyperlink)                                                                   |
+| ----- | -------------- | -------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| S1    | surfactant 60  | $23^3$                     | [maestrowf executable](../bin/self_assemble_surfactant60.yaml)   | [directory](../data/raw/self_assembly_polymer_surfactant60_toluene_water_20260401-143905/)       |
+| S2    | surfactant 120 | $23^3$                     | [maestrowf executable](../bin/self_assemble_surfactant120.yaml)  | [directory](../data/raw/self_assembly_polymer_surfactant120_toluene_water_20260402-185803/)      |
+| S3    | surfactant 150 | $23^3$                     | [maestrowf executable](../bin/self_assemble_surfactant150.yaml)  | [directory](../data/raw/self_assembly_polymer_surfactant150_toluene_water_20260403-111056/)      |
+| S4    | surfactant 180 | $23^3$                     | [maestrowf executable](../bin/self_assemble_surfactant180.yaml)  | [directory](../data/raw/self_assembly_polymer_surfactant180_toluene_water_20260401-163540/)      |
+| S5    | surfactant 530 | $23^3$                     | [maestrowf executable](../bin/self_assemble_surfactant530.yaml)  | [directory](../data/raw/self_assembly_polymer_surfactant530_toluene_water_20260430-171831/)      |
+| S6    | surfactant 405 | $34.5^3$                   | [maestrowf executable](../bin/box_var_self_assemble_scale.yaml)  | [directory](../data/raw/box_var_self_assembly_polymer_surfactant_toluene_water_20260426-192641/) |
+|       | surfactant 608 | $34.5^3$                   |                                                                  |                                                                                                  |
+| S7    | surfactant 120 | $34.5^3$                   | [maestrowf executable](../bin/box_var_self_assemble_dilute.yaml) | [directory](../data/raw/box_var_self_assembly_polymer_surfactant_toluene_water_20260501-192849/) |
+|       | surfactant 180 | $34.5^3$                   |                                                                  |                                                                                                  |
+
+```{note}
+Till **S5**, each system with specific surfactant count was handled individually with separate base directory. Only for **S6** and **S7**, owing to find the presence of finite size effects, different surfactant systems are present in the same base directory.
+```
+
+For this project, for the Polymer-solvent-Surfactant-Water system, I went with using [maestro workflow conductor](https://maestrowf.readthedocs.io/en/latest/) or maestrowf, a python package, which helps in automating multiple aspects of the project from a single comamnd execution. For simulations in Darwin, I would encourage one to install maestrowf in their conda environment or python environment (`pip install maestrowf`). Maestrowf helps in creating a study (through the help of a `.yaml` script) and running the study. 
+In our case, the study script is the different maestrowf executables mentioned in the above table. To run the script, use the single line command `maestro run self_assemble_surfactant120.yaml -a 2 -r 2`, where the flag `-a` denotes the maximum number of submission attempts before a step is marked as failed and `-r` denotes the maximum number of restarts allowed for the given file (provided restart option is separately handled in the `.yaml` file - which is handled in the provided `.yaml` files).
 
 ---
 # Notes
