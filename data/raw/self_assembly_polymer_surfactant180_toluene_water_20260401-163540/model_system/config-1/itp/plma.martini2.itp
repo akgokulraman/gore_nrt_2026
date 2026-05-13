@@ -1,0 +1,27 @@
+; https://doi.org/10.1021/acs.jpcb.5b03611
+; https://doi.org/10.1039/C8ME00064F
+[ moleculetype ]
+LMA 1
+;
+[ atoms ]
+;  nr    type            resnr   residu    atom     cgnr        charge   
+   1     SC1             1       LMA       MB       1           0.0   
+   2     Na              1       LMA       ME       2           0.0 
+   3     SC1             1       LMA       MT       3           0.0   
+   4     C1              1       LMA       E1       4           0.0   
+   5     C1              1       LMA       E2       5           0.0  
+;
+[ bonds ]
+;  ai    aj   funct  bo(nm)   kb(kJ mol−1 nm−2)
+   1     2    1      0.282    17000
+   2     3    1      0.383    5000
+   3     4    1      0.460    2000
+   4     5    1      0.460    2000
+   1     6    1      0.289    21100   
+;
+[ angles ]
+;  ai    aj   ak     funct  theta_o(deg)   k_theta(kJ mol−1 nm−2)
+   1     2    3      2      144            67
+   2     3    4      2      180            25
+   3     4    5      2      180            25
+   1     6    11     2      175            13
