@@ -89,6 +89,33 @@ For this project, for the Polymer-solvent-Surfactant-Water system, I went with u
 In our case, the study script is the different maestrowf executables mentioned in the above table. To run the script, use the single line command `maestro run self_assemble_surfactant120.yaml -a 2 -r 2`, where the flag `-a` denotes the maximum number of submission attempts before a step is marked as failed and `-r` denotes the maximum number of restarts allowed for the given file (provided restart option is separately handled in the `.yaml` file - which is handled in the provided `.yaml` files).
 
 ---
+# Analysis
+For the analysis, refer to the [notebooks](../notebooks/) directory. We can biverigate analysis into three parts: (a) post-simulation analysis, (b) property analysis, and (c) case-comparitive analysis.
+
+## Post-Simulation analysis
+In the case of post-simulation analysis, we leverage the functionalities of GROMACS to obtain certain key important features, like the theormodynamic properties (Potential Energy, Kinetic Energy, Temperature, Pressure, Density), structural properties (number of clusters, Radial Distribution Function). Except for Radial Distribution function, all the other properties are obtained as time dependent properties. For Radial Distribution Function, we obtain the data for the last timestep from the production run.
+
+To obtain the respective data through the GROMACS analysis, we automate the process through executing a python file named [properties.py](../notebooks/properties.py). The command follows 
+```{code}
+python notebooks/properties.py data/raw/self_assembly_polymer_surfactant180_toluene_water_20260401-163540
+```
+where the arguement passed will be the location of the simulation base directory. The command will create necessary sub-directories and files to obtain the necessary properties.
+
+## Property Analysis
+Once the relavant features (or properties) of the desired simulation directory is obtained, we then proceed with obtaining the standard plots like the thermodynamic data plots of PE, density (only for equilibration_NPT), Pressure, Temperature and also of that of Number of Clusters over time. These plots are quite standard and will help in deciding if the system is properly equilibrated and if the resulting emulsion is stable. We again automate this plotting by using the command
+```{code}
+python notebooks/thermo_analysis.py data/raw/box_var_self_assembly_polymer_surfactant_toluene_water_20260426-192641 production_NVT figures box_length-34.5_.config-1_.polymer-68_.surfactant-608_.toluene-42053
+```
+where the arguements passed will be (1) location of the simulation base directory, (2) stage of the simulation you want to anlayse (options are equilibration_NPT, production_NVT), and (3) location where you want to save the plots and (4) which sub-directories (like `config-1`, `config-2`, `box_length-34.5_.config-1_.polymer-68_.surfactant-608_.toluene-42053`) you want to plot for. For the cases where there are three configurations (`config-1`, `config-2`, `config-3`), we want to plot their average and standard deviations. Then, we use `'*'` for the last arguement, as shown below. 
+```{code}
+python thermo_analysis.py data/raw/self_assembly_polymer_surfactant180_toluene_water_20260401-163540 production_NVT figures '*'
+```
+As the examples suggests, the directory where the plots are stored is [figures](../figures/).
+
+## Case-Comparitive Analysis
+As the name suggests, through this analysis, we compare different cases. We mostly use this type of analysis to analyse the Radial Distribution Fucntions of the different systems and understand the effect of sufactant concentration in the system. Some notable analysis done under this subsection includes, RDF analysis to compare the distribution between different surfactant counts (refer [Figure](../figures/RDF_vary_surfactant_MB-Head12.png)), and to plot the variation of the peak of polymer-surfactant distribution function with respect to the surfactant count (refer [Figure](../figures/g_r_peak_clusters_vary_surfactant.png)). Both these analysis help in describing how surfactants influence the structural property of the emulsion.
+
+---
 # Notes
 <!-- Notes from seminars, meetings, discussions -->
 
