@@ -10,6 +10,7 @@ The raw data are stored in the [raw](./data/) directory. Each sub-directory with
 The commonly used simulation input files (for surfactant-water, polymer-solvent-surfactant-water) are stored in the [input](./data/input/) directory. These input scripts are also copied to respective sub-directories within the [raw](./data/raw/) directory for ease of operation. Thus, one can re-run the simulation, by executing the bash script in the subdirectories in [raw](./data/raw/), without needing to copy any files or such.
 
 One important thing to note is that, each simulation directory or sub-directory within [raw](./data/raw/) has the following organization(s):
+
 (a) simulation of $23^3\text{nm}^3$ system with fixed polymer and toluene molecules count (polymer-20, toluene-12460), varying the surfactant count accordingly. Below is the file directory listing for surfactant-60.
 ```
 self_assembly_polymer_surfactant60_toluene_water_20260401-143905/
@@ -101,6 +102,7 @@ The project was made possible through the resources used in [DARWIN high perform
 
 # Team and Contact
 Project Members: Gokul Raman Arumugam Kumar, Rudy DiMura, and Abigail Sicher
+
 Project Mentors: Dr. Vasudevan Venkateshwaran, Dr. Soham Jariwala
 
 If any questions/discussion with regards to the project, please reach out to Gokul Raman at *gokul@udel.edu* or through [Linkedin](https://www.linkedin.com/in/gokul-raman/). 
