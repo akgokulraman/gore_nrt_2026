@@ -1,0 +1,255 @@
+description:
+    name: self_assembly_polymer_surfactant60_toluene_water
+    description: Simulation of the self-assembly behavior of the system - surfactant + polymer + solvent(s)
+
+batch:
+    type: slurm
+    queue: standard # partition
+    host: gokul
+    bank: ea-nrtmidas
+
+env:
+    variables:
+      PROJECT_DIR: /lustre/ea-nrtmidas/users/3770/emulsion_stability
+      INPUT_DIR: /lustre/ea-nrtmidas/users/3770/emulsion_stability/data/input/polymer_surfactant_solvent
+      OUTPUT_PATH: /lustre/ea-nrtmidas/users/3770/emulsion_stability/data/raw
+      SURFACTANT_COUNT: 60
+      POLYMER_COUNT: 20
+      TOLUENE_COUNT: 12460
+      BOX_LENGTH: 23.00
+
+study:
+      - name: model_system
+        description: Model the initial configuration of the system. Create three initial configurations to ensure the validity, reproducibility, and statistical significance of the simulation results.
+        run:
+          cmd: |
+              #SBATCH --ntasks-per-node=1
+              #SBATCH --cpus-per-task=1
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+
+              # adding necessary packages
+              vpkg_require gromacs  
+              . /opt/shared/slurm/templates/libexec/openmpi.sh  
+              vpkg_require conda
+              conda activate md
+
+              # copy relavant files
+              cp -r $(INPUT_DIR)/itp .
+              mkdir top
+              cp $(INPUT_DIR)/top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top top
+              cp  $(INPUT_DIR)/*.gro .
+
+              # create topology of the system
+              $(LAUNCHER) --mpi=pmix gmx insert-molecules -ci surfactant.gro -nmol $(SURFACTANT_COUNT)  -box $(BOX_LENGTH) $(BOX_LENGTH) $(BOX_LENGTH) -o surfactant$(SURFACTANT_COUNT)_conf$(config).gro
+              $(LAUNCHER) --mpi=pmix gmx insert-molecules -ci polymer.gro -nmol $(POLYMER_COUNT) -f surfactant$(SURFACTANT_COUNT)_conf$(config).gro -o polymer$(POLYMER_COUNT)_surfactant$(SURFACTANT_COUNT)_conf$(config).gro
+              $(LAUNCHER) --mpi=pmix gmx insert-molecules -ci toluene.gro -nmol $(TOLUENE_COUNT) -f polymer$(POLYMER_COUNT)_surfactant$(SURFACTANT_COUNT)_conf$(config).gro -o toluene$(TOLUENE_COUNT)_polymer$(POLYMER_COUNT)_surfactant$(SURFACTANT_COUNT)_conf$(config).gro
+              
+              # solvate the system with water
+              $(LAUNCHER) --mpi=pmix gmx solvate -cp toluene$(TOLUENE_COUNT)_polymer$(POLYMER_COUNT)_surfactant$(SURFACTANT_COUNT)_conf$(config).gro -cs water.gro -o solvated_surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).gro -p top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top
+
+          walltime: "00:10:00"
+          procs: 1
+          nodes: 1
+      - name: equilibration_EM
+        description: Perform energy minimization on the system.
+        run:
+          cmd: |
+              #SBATCH --ntasks-per-node=1
+              #SBATCH --cpus-per-task=1
+              #SBATCH --export=NONE
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+
+              # adding necessary packages
+              vpkg_require gromacs  
+              . /opt/shared/slurm/templates/libexec/openmpi.sh  
+              vpkg_require conda
+              conda activate md
+
+              # copy relavant files
+              cp -r $(INPUT_DIR)/itp .
+              mkdir top
+              cp ../../model_system/config-$(config)/top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top top
+              cp ../../model_system/config-$(config)/solvated_surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).gro .
+
+              # simulation                
+              $(LAUNCHER) --mpi=pmix gmx grompp -f $(INPUT_DIR)/mdp/em.mdp -c solvated_surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).gro -p top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top -o emin_conf$(config).tpr
+              $(LAUNCHER) --mpi=pmix gmx mdrun -v -deffnm emin_conf$(config)  -cpt 15
+
+          restart: |
+              #SBATCH --ntasks-per-node=1
+              #SBATCH --cpus-per-task=1
+              #SBATCH --mail-user=gokul@udel.edu
+              #SBATCH --mail-type=END,FAIL
+              #SBATCH --export=NONE
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+
+              # adding necessary packages
+              vpkg_require gromacs   
+              . /opt/shared/slurm/templates/libexec/openmpi.sh
+
+              # rerun simulation
+              $(LAUNCHER) --mpi=pmix gmx mdrun -cpi emin_conf$(config) -s emin_conf$(config).tpr -deffnm emin_conf$(config)
+          procs: 1
+          nodes: 1
+          walltime: "00:15:00"
+          depends: [model_system]                
+      - name: equilibration_NVT
+        description: Equilibrate the system using NVT ensemble.
+        run:
+          cmd: |
+              #SBATCH --ntasks-per-node=32
+              #SBATCH --cpus-per-task=1
+              #SBATCH --mail-user=gokul@udel.edu
+              #SBATCH --mail-type=FAIL
+              #SBATCH --export=NONE
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+
+              # adding necessary packages
+              vpkg_require gromacs 
+              . /opt/shared/slurm/templates/libexec/openmpi.sh   
+              vpkg_require conda
+              conda activate md
+
+              # copy relavant files
+              cp -r $(INPUT_DIR)/itp .
+              mkdir top
+              cp ../../model_system/config-$(config)/top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top top
+              cp ../../equilibration_EM/config-$(config)/emin_conf$(config).gro .
+
+              # simulation                
+              $(LAUNCHER) --mpi=pmix gmx grompp -f $(INPUT_DIR)/mdp/nvt_eq.mdp -c emin_conf$(config).gro -p top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top -o nvt_eq_conf$(config).tpr
+              $(LAUNCHER) --mpi=pmix gmx mdrun -v -deffnm nvt_eq_conf$(config)  -cpt 15
+
+          restart: |
+              #SBATCH --ntasks-per-node=32
+              #SBATCH --cpus-per-task=1
+              #SBATCH --mail-user=gokul@udel.edu
+              #SBATCH --mail-type=FAIL
+              #SBATCH --export=NONE
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+
+              # adding necessary packages
+              vpkg_require gromacs 
+              . /opt/shared/slurm/templates/libexec/openmpi.sh 
+
+              # rerun simulation
+              $(LAUNCHER) --mpi=pmix gmx mdrun -cpi nvt_eq_conf$(config) -s nvt_eq_conf$(config).tpr -deffnm nvt_eq_conf$(config)
+          procs: 32
+          nodes: 1
+          walltime: "01:20:00"
+          depends: [equilibration_EM]
+      - name: equilibration_NPT
+        description: Equilibrate the system using NPT ensemble.
+        run:
+          cmd: |
+              #SBATCH --ntasks-per-node=32
+              #SBATCH --cpus-per-task=1
+              #SBATCH --mail-user=gokul@udel.edu
+              #SBATCH --mail-type=FAIL
+              #SBATCH --export=NONE
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+
+              # adding necessary packages
+              vpkg_require gromacs   
+              . /opt/shared/slurm/templates/libexec/openmpi.sh 
+              vpkg_require conda
+              conda activate md
+
+              # copy relavant files
+              cp -r $(INPUT_DIR)/itp .
+              mkdir top
+              cp ../../model_system/config-$(config)/top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top top
+              cp ../../equilibration_NVT/config-$(config)/nvt_eq_conf$(config).gro .
+
+              # simulation                
+              $(LAUNCHER) --mpi=pmix gmx grompp -f $(INPUT_DIR)/mdp/npt_eq.mdp -c nvt_eq_conf$(config).gro -p top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top -o npt_eq_conf$(config).tpr
+              $(LAUNCHER) --mpi=pmix gmx mdrun -v -deffnm npt_eq_conf$(config)  -cpt 15
+
+          restart: |
+              #SBATCH --ntasks-per-node=32
+              #SBATCH --cpus-per-task=1
+              #SBATCH --mail-user=gokul@udel.edu
+              #SBATCH --mail-type=END,FAIL
+              #SBATCH --export=NONE
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+
+              # adding necessary packages
+              vpkg_require gromacs  
+
+              # rerun simulation
+              $(LAUNCHER) --mpi=pmix gmx mdrun -cpi npt_eq_conf$(config) -s npt_eq_conf$(config).tpr -deffnm npt_eq_conf$(config)
+          procs: 32
+          nodes: 1
+          walltime: "2:30:00"
+          depends: [equilibration_NVT]
+      - name: production_NVT
+        description: Equilibrate the system using NPT ensemble.
+        run:
+          cmd: |
+              #SBATCH --ntasks-per-node=32
+              #SBATCH --cpus-per-task=1
+              #SBATCH --mail-user=gokul@udel.edu
+              #SBATCH --mail-type=END,FAIL
+              #SBATCH --export=NONE
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+
+              # adding necessary packages
+              vpkg_require gromacs  
+              . /opt/shared/slurm/templates/libexec/openmpi.sh  
+              vpkg_require conda
+              conda activate md
+
+              # copy relavant files
+              cp -r $(INPUT_DIR)/itp .
+              mkdir top
+              cp ../../model_system/config-$(config)/top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top top
+              cp ../../equilibration_NPT/config-$(config)/npt_eq_conf$(config).gro .
+
+              # simulation                
+              $(LAUNCHER) --mpi=pmix gmx grompp -f $(INPUT_DIR)/mdp/nvt_prod.mdp -c npt_eq_conf$(config).gro -p top/surfactant-$(SURFACTANT_COUNT)_polymer-$(POLYMER_COUNT)_toluene-$(TOLUENE_COUNT)_water_conf$(config).top -o nvt_prod_conf$(config).tpr
+              $(LAUNCHER) --mpi=pmix gmx mdrun -v -deffnm nvt_prod_conf$(config)  -cpt 15
+
+          restart: |
+              #SBATCH --ntasks-per-node=32
+              #SBATCH --cpus-per-task=1
+              #SBATCH --mail-user=gokul@udel.edu
+              #SBATCH --mail-type=END,FAIL
+              #SBATCH --export=NONE
+              #UD_QUIET_JOB_SETUP=YES
+              #UD_MACHINE_FILE_FORMAT='%h%[:]C'
+              #export UD_JOB_EXIT_FN_SIGNALS="SIGTERM EXIT"  
+
+              # adding necessary packages
+              vpkg_require gromacs  
+              . /opt/shared/slurm/templates/libexec/openmpi.sh
+
+              # rerun simulation
+              $(LAUNCHER) --mpi=pmix gmx mdrun -cpi nvt_prod_conf$(config) -s nvt_prod_conf$(config).tpr -deffnm nvt_prod_conf$(config)
+          procs: 32
+          nodes: 2
+          walltime: "27:00:00"
+          depends: [equilibration_NPT]
+
+global.parameters:
+    config:
+        values  : [1,2,3]
+        label   : config-%%
